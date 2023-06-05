@@ -56,7 +56,7 @@ for i in range(20):
     print(f"==={i}===")
     for j in range (100):
         board = generate(i+1)
-        np.save(f'boards/{i}_{j}.npy',board)
+        board = np.load(f'boards/{i}_{j}.npy')
         exp='111' # 指定version
         done, sequence = inference(board,exp)
         if(done):
