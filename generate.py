@@ -50,6 +50,7 @@ def generate(steps=4):
         state = nextState
     return state
 
+sr = []
 for i in range(20):
     # 测试1-10的难度
     success = 0
@@ -57,10 +58,16 @@ for i in range(20):
     for j in range (100):
         board = generate(i+1)
         board = np.load(f'boards/{i}_{j}.npy')
-        exp='111' # 指定version
+        exp='dqn_embed=4_nstep=3' # 指定version
         done, sequence = inference(board,exp)
         if(done):
             success+=1
     print(success)
+    sr.append(str(success))
+str1 = ' & '.join(sr[:10])
+str2 = ' & '.join(sr[10:])
+print(str1,str2)
+import json
+json.dump(sr,open(f'save/{exp}_success_rate.json','w'))
     # done, 是否拼成，sequence是符合之前讨论要求的序列
 

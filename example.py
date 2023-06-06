@@ -50,13 +50,16 @@ def generate(steps=4):
         state = nextState
     return state
 
-for i in range(15):
+
+
+sr = []
+for i in range(20):
     # 测试1-10的难度
     print(f"==={i}===")
     board = [[0,4,2],[7,1,3],[8,5,6]] # 随便举个例子，不会用到
     board = generate(i+1)
-    exp='111' # 指定version
-    done, sequence = inference(board,exp)
+    exp_name='dqn_embed=4_nstep=3' # 指定version
+    done, sequence = inference(board,exp_name)
     print(done,sequence)
-    # done, 是否拼成，sequence是符合之前讨论要求的序列
+
 

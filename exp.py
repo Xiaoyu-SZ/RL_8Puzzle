@@ -2,7 +2,7 @@
 # import torch.nn.functional as F
 import torch.nn as nn
 import torch
-from Model import NetModel,DuelingDqn
+from Model import NetModel,DuelingDqn,DuelingDqn_embed
 from collections import deque
 
 
@@ -26,7 +26,7 @@ Memory_capacity = 5000
 env = EightPuzzleEnv(3, 3)  # (2, 3)
 N_actions = 4
 N_states = 9
-N_STEP = 6
+
 # ENV_A_SHAPE = 0 if isinstance(env.action_space.sample(), int) else env.action_space.sample().shape
 from typing import Dict, List, Tuple
 
@@ -171,8 +171,8 @@ class ReplayBuffer:
 
 class DQN_Agent(object):
     def __init__(self, lr=1e-4):
-        self.eval_net, self.target_net = DuelingDqn(N_states, N_actions).to(device) \
-            , DuelingDqn(N_states, N_actions).to(device)
+        self.eval_net, self.target_net = DuelingDqn_embed(N_states, N_actions).to(device) \
+            , DuelingDqn_embed(N_states, N_actions).to(device)
         self.learn_step_counter = 0  # for target updating
         self.memory_counter = 0  # for storing memory
         # self.memory = np.zeros((Memory_capacity, N_states * 2 + 2))  # initialize memory
@@ -333,7 +333,6 @@ def test(d_step,section=1):
     for i in range(N):
         step = 0
         s = env.reset(step=d_step)
-        print(s)
         s = s.flatten()
         while True:
             a = agent.predict(s)
@@ -373,27 +372,31 @@ def inference(board,section):
         s = s_
     return done, status_sequence
 
-
+N_STEP = 6
+train_epoch = {}
+import json
 
 def main():
     dqn = DQN_Agent(1e-6)  # 0.0005 warm up????
-    exp_name = 'init'
-    dqn.continue_train(exp_name)
-    test(exp_name)
-    for i in range(5,15):
+    exp_name = 'dqn_embed=4_nstep=3'
+
+    for i in range(5,20):
         print(f'=====Training Difficulties:{i} =====')
         dqn.optimizer.param_groups[0]['lr'] = 1e-5
-        Epsilon = 0.4
-        sucess_rate = train(dqn, env, EPOCH, exp_name)
+        sucess_rate = train(i,dqn, env, EPOCH, exp_name)
         count = 0
+        epochs = EPOCH
         while(sucess_rate < 0.9):
             print(f'=====Training Difficulties(Additional):{i} Round-{count} =====')
-            sucess_rate = train(dqn,env,1000,exp_name)
+            sucess_rate = train(i,dqn,env,1000,exp_name)
             count+=1
-            if(count >=5):
+            epochs += 1000
+            if(count >=10):
                 break
         difficulty_steps = i
+        train_epoch[i] = epochs
         test(i,exp_name)
+    json.dump(train_epoch,open(f'save/{exp_name}.json','w'))
     
 
 if __name__ == "__main__":

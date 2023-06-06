@@ -101,9 +101,6 @@ def findZeroPos(board, m, n):
 
 
 def A_star_dist(target, now):
-    '''
-    A*估价,比较当前棋盘与最终棋盘，计算有多少棋子未摆放正确
-    '''
     length = len(now)
     cnt = 0
     for i in range(0, length):
@@ -221,99 +218,3 @@ class EightPuzzleEnv:  # gym.Env
     @property
     def max_episode_steps(self):
         return self._max_episode_steps
-
-
-def Manhattan(target, state):
-    """
-    曼哈顿距离
-    :return:
-    """
-    dist = 0
-    for num in range(9):
-        t = np.array(np.where(target == num))
-        st = np.array(np.where(state == num))
-        dist += np.sum(abs(t - st))
-    return dist
-
-
-def expDist(x, mu):
-    '''
-    指数分布
-    均值和标准差均是:1/λ
-    '''
-    landa = 1 / mu
-    return landa * np.exp(-landa * x)
-
-
-def NDist(x, mu, std):
-    '''
-    正态分布
-    '''
-    par = 1 / (np.sqrt(2 * np.pi) * std)
-    return par * np.exp(-(x - mu) ** 2 / 2 / std ** 2)
-
-
-def buddaAgent(env):
-    """
-         佛系agent
-    """
-    return np.random.randint(0, env.ActionDim)
-
-
-if __name__ == '__main__':
-    env = EightPuzzleEnv(3, 3)
-    env.reset3(8)
-    env.reset3()
-    env.reset3()
-    # env = EightPuzzleEnv(2, 3)
-    # # 统计到达终点的步数，猜测数据分布
-    # lst = []
-    # MAX_ITER = 2048
-    # for i in range(MAX_ITER):
-    #     env.reset()
-    #     cnt = 0
-    #     while True:
-    #         a = buddaAgent(env)
-    #         nextS, r, terminal, info = env.step(a)
-    #         cnt += 1
-    #         if terminal:
-    #             break
-    #     if i % 50 == 0:
-    #         print(i, 'stepCnt:', cnt)
-    #     lst.append(cnt)
-    # print()
-    # print('min:', np.min(lst))
-    # print('mean:', np.mean(lst))
-    # print('median:', np.median(lst))
-    # print('max:', np.max(lst))
-    # print('std:', np.std(lst))
-    # print('mean divide std:', np.mean(lst) / np.std(lst))
-    #
-    # print('猜测数据服从指数分布')
-    # max_value = int(np.max(np.max(lst)))
-    # XTick = np.linspace(0, 2e4, 21)
-    # plt.hist(lst, bins=64, alpha=0.5, color='red', edgecolor='red', density=True, range=(0, max_value))
-    # x = np.linspace(0, max_value, max_value)
-    # y = expDist(x, np.mean(lst))
-    # plt.xticks(XTick)
-    # plt.plot(x, y, color='blue', lw=2)
-    #
-    # # 对佛系agent进行测试
-    # x, label = testCase()
-    # okCnt = 0
-    # for i in range(len(x)):
-    #     board = x[i]
-    #     correctCnt = label[i]
-    #     env.reset()
-    #     cnt = 0
-    #     while True:
-    #         a = buddaAgent(env)
-    #         nextS, r, terminal, info = env.step(a)
-    #         cnt += 1
-    #         if terminal:
-    #             break
-    #     if cnt == correctCnt:
-    #         okCnt += 1
-    # print()
-    # print('佛系智能体的准确率:{:.1f}%'.format(okCnt / len(x) * 100))
-    # plt.show()
